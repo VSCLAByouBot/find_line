@@ -33,7 +33,7 @@ class FindLine_V
 		FILE *fout;
 		fout = fopen("/home/huang/slope.txt","a");
 		fprintf(fout,"%s","----------------");		
-		image_sub_ = it_.subscribe("/camera/image_raw", 1, &FindLine_V::FindLineCB, this);
+		image_sub_ = it_.subscribe("/camera/image_rect_color", 1, &FindLine_V::FindLineCB, this);
 		chatter_pub = nh_.advertise<std_msgs::Char>("chatter",10);//
 		namedWindow("Find line");
 		dilate_ = getStructuringElement(MORPH_RECT, Size(9, 9), Point(4, 4));
@@ -167,7 +167,7 @@ class FindLine_V
 	{
 		//resize(image, image, Size(image.cols/2, image.rows/2));
 		roi = image(Rect(0, image.rows/2, image.cols, image.rows/2));
-		
+		//roi = image(Rect(0, 0, image.cols, image.rows));
 		pt2_st = roi.rows * 3 / 4;  
 		sec_y = roi.rows * 1 / 4;  
 
@@ -281,9 +281,9 @@ class FindLine_V
 	void TransSlopeToChar()
 	{
 		pub_que.push('i');
-		if(-0.1<=m_line&&m_line<0.1)//forwards
+		if(-0.3<=m_line&&m_line<0.3)//forwards
 			pub_que.push('i');
-		else if(0.1<=m_line&&m_line<1.1)//right front 30 degree
+		else if(0.3<=m_line&&m_line<1.1)//right front 30 degree
 			pub_que.push('t');
 		else if(1.1<=m_line&&m_line<5)//right front 60 degree
 			pub_que.push('y');

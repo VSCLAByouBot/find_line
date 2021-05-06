@@ -9,7 +9,7 @@ import time
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Char
 import sys, select, termios, tty, signal
-
+pub_time = 0.3# publish how long time
 msg = """
 Reading from the keyboard  and Publishing to Twist!
 ---------------------------
@@ -39,10 +39,10 @@ moveBindings = {
 		#new add
 		'r':(0.57,1,0), # left front 30 degree
 		'e':(1,0.57,0), # left front 60 degree
-		't':(0.57,-1,0)	#right front 30 degree
-		'y':(1,-0.57,0) #right front 60 degree
-		'd':(-0.57,1,0)	#left back 30 degree
-		'f':(-1,0.57,0) #left back 60 degree
+		't':(0.57,-1,0),	#right front 30 degree
+		'y':(1,-0.57,0), #right front 60 degree
+		'd':(-0.57,1,0),	#left back 30 degree
+		'f':(-1,0.57,0), #left back 60 degree
 		'h':(-0.57,-1,0)#right back 30 degree
 	       }
 speedBindings={
@@ -51,7 +51,7 @@ speedBindings={
 		'w':(1.1,1),
 		'x':(.9,1),
 		'p':(1,1.1),
-		'o':(1,.9),
+		'o':(1,.9)
 	      }
 
 
@@ -128,9 +128,9 @@ def pub_to_car(data):
 	start = time.time()
 	end = start
 	if key == 'k':	 #stop
-		print('hi')				
+		print('stop')				
 	else:
-		while((end-start)<1): # publish how long time
+		while((end-start)<pub_time): # publish how long time
 			pub.publish(twist)
 			end = time.time()
 			#print("end-start",end-start)

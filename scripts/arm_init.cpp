@@ -76,9 +76,9 @@ brics_actuator::JointPositions getPostions(const int jointSet, vector<int> joint
 		case find_line:	
 			cout << "\ngenerate position set : find line ..." << endl;
 			arm_joint_value[0] = 165 * DEG2RAD;
-			arm_joint_value[1] = 100 * DEG2RAD; 
+			arm_joint_value[1] = 95 * DEG2RAD; 
 			arm_joint_value[2] = -40 * DEG2RAD;
-			arm_joint_value[3] = 125 * DEG2RAD;
+			arm_joint_value[3] = 145 * DEG2RAD;
 			arm_joint_value[4] = 165 * DEG2RAD;
 			break;
 

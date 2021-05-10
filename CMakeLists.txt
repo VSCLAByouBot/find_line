@@ -140,7 +140,7 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(talker scripts/talker.cpp)
-add_executable(findline scripts/findline3.cpp)
+add_executable(findline scripts/findline2.cpp)
 add_executable(arm scripts/arm_init.cpp)
 add_executable(base_listener scripts/base_listener.cpp)
 ## Rename C++ executable without prefix
@@ -179,6 +179,7 @@ target_link_libraries(base_listener
 catkin_install_python(PROGRAMS
   scripts/youbot_keyboard_teleop_modify.py
   scripts/listener.py
+  scripts/go_back.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

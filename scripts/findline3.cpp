@@ -9,6 +9,7 @@
 #include<queue>
 #include<stdio.h>
 #include<iostream>
+#include<algorithm>
 #define get_data_rate 15 //5
 #define pub_data_rate 3 //1
 //#define CalSlopeAndPixelOnly
@@ -163,76 +164,92 @@ class FindLine_V
 		}
 		resize(image, image, Size(image.cols/2, image.rows/2));
 	}// end Callback Function
+	static bool cmp1(const vector<Point> &a, const vector<Point> &b)
+	{
+		return a[0].y > b[0].y;
+	}
 	void CalSlopeAndPixel()
 	{
 		//resize(image, image, Size(image.cols/2, image.rows/2));
 		roi = image(Rect(0, image.rows/2, image.cols, image.rows/2));
 		//roi = image(Rect(0, 0, image.cols, image.rows));
-		pt2_st = roi.rows * 3 / 4;  
+		
+		/*pt2_st = roi.rows * 3 / 4;  
 		sec_y = roi.rows * 1 / 4;  
 
 		roi_Rect[0] = Rect(0, 0, roi.cols, sec_y);
 		roi_Rect[1] = Rect(0, pt2_st, roi.cols, sec_y);
-		check_up = roi(roi_Rect[0]);
+		check_up = roi(roi_Rect[0]);*/
+		check_up = roi;
 		//check_up = image(Rect(0, image.rows/2, image.cols, image.rows/8));//roi up
 		cvtColor(check_up, check_up, COLOR_BGR2GRAY);
 		GaussianBlur(check_up, check_up, Size(19, 19), 0);
 		threshold(check_up, check_up, 15, 255, THRESH_BINARY_INV);
 		
-		check_down = roi(roi_Rect[1]);
-		//check_down = image(Rect(0, (image.rows)*(7.0/8.0), image.cols, image.rows/8));//roi down
+		/*check_down = roi(roi_Rect[1]);
 		cvtColor(check_down, check_down, COLOR_BGR2GRAY);
 		GaussianBlur(check_down, check_down, Size(19, 19), 0);
-		threshold(check_down, check_down, 15, 255, THRESH_BINARY_INV);
+		threshold(check_down, check_down, 15, 255, THRESH_BINARY_INV);*/
 		count_W_up = countNonZero(check_up);
-		count_W_down = countNonZero(check_down);
+		//count_W_down = countNonZero(check_down);
 		//cout<<"count_W_up"<<count_W_up<<endl;
 		//cout<<"count_W_down"<<count_W_down<<endl;
-		if((count_W_up < theshold)||(count_W_down < theshold))
+		if((count_W_up < theshold))
 		{
 			if(count_W_up < theshold)
 				ROS_INFO("Upper pixel can't detect.");
-			if(count_W_down < theshold)
-				ROS_INFO("Down pixel can't detect.");
+
 			imshow("Find line", roi);
 			waitKey(100);
 		}
 		else
 		{	
-			for(int r = 0; r < 2; r++)
-			{
-				Mat src = roi(roi_Rect[r]);
 			
-				cvtColor(src, src, COLOR_BGR2GRAY);
-				GaussianBlur(src, src, Size(19, 19), 0);
-				threshold(src, src, 15, 255, THRESH_BINARY_INV);
-				dilate(src, src, dilate_);
-				
-				vector<vector<Point> > contours;
-				vector<Vec4i> hierarchy;
-				findContours(src, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
-				
-				//cout<<contours.size()<<"  "<<contours[0].size()<<endl;
-				//cout<"FC"<<endl;
-				int largest_area = 0;
-				int largest_area_index = 0;
-				for (size_t i = 0; i < contours.size(); i++)
-				{
-					double area = contourArea(contours[i]);
-					if (area > largest_area){
-						largest_area = area;
-						largest_area_index = i;
-					}
+			Mat src = roi;
+		
+			cvtColor(src, src, COLOR_BGR2GRAY);
+			GaussianBlur(src, src, Size(19, 19), 0);
+			threshold(src, src, 15, 255, THRESH_BINARY_INV);
+			dilate(src, src, dilate_);
+			
+			vector<vector<Point> > contours;
+			vector<Vec4i> hierarchy;
+			findContours(src, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
+			//sort contours of y from the biggest to the smallest
+			std::sort(contours.begin(), contours.end(), FindLine_V::cmp1);
+			for(int i = 0;i < contours.size();i++)
+			{
+				for(int j = 0;j < contours[i].size();j++)
+				{	
+					cout<<contours[i][j]<<"  ";
 				}
-	
-				cnt.push_back(contours[largest_area_index]);
+				cout<<endl;
+			}
+			//the biggest y goes up some scale, 
+			//and use find contours to get the contour of down roi
+			//the smallest y goes down some scale, 
+			//and use find contours to get the contour of upper roi
+			//stop criteria: When upper roi and down roi is overlap
+			
+			int largest_area = 0;
+			int largest_area_index = 0;
+			for (size_t i = 0; i < contours.size(); i++)
+			{
+				double area = contourArea(contours[i]);
+				if (area > largest_area){
+					largest_area = area;
+					largest_area_index = i;
+				}
+			}
 
-				Moments mu = moments(contours[largest_area_index]);
-				int cx = (int)(mu.m10/mu.m00);
-				int cy = (int)(mu.m01/mu.m00);
+			cnt.push_back(contours[largest_area_index]);
 
-				centers[r] = Point(cx, cy);
-			}// end for
+			Moments mu = moments(contours[largest_area_index]);
+			int cx = (int)(mu.m10/mu.m00);
+			int cy = (int)(mu.m01/mu.m00);
+
+			centers[0] = Point(cx, cy);
+			
 		drawing = roi.clone();
 
 		//rectangle(drawing, roi_Rect[0], Scalar(255, 0, 0), 2.5);

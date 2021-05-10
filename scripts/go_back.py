@@ -1,39 +1,12 @@
 #!/usr/bin/env python
-# Initial code created by Graylin Trevor Jay (tjay@cs.brown.edu) an published under Crative Commens Attribution license.
-# addition for signal interrupt by Koen Buys
-
-#import youbot_driver_ros_interface
-#import roslib; roslib.load_manifest('youbot_oodl')
 import rospy
 import time
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Char
 import sys, select, termios, tty, signal
-pub_time = 0.13# publish how long time
-speed = 0.2
-turn = 0.3
-f = open('/home/huang/data2.txt','w')
-f.write(str(pub_time)+'\n')
-f.write(str(speed)+'\n')
-f.write(str(turn)+'\n')
-
-
-msg = """
-Reading from the keyboard  and Publishing to Twist!
----------------------------
-Moving around:
-   u    i    o
-   j    k    l
-   m    ,    .
-
-q/z : increase/decrease max speeds by 10%
-w/x : increase/decrease only linear speed by 10%
-e/c : increase/decrease only angular speed by 10%
-anything else : stop
-
-CTRL-C to quit
-"""
-
+pub_time = 0
+speed = 0
+turn = 0
 moveBindings = {
 #		     x,y,tetha ratio
 		'i':(0.6,0,0), 	# forwards
@@ -63,28 +36,17 @@ speedBindings={
 	      }
 
 
-class TimeoutException(Exception): 
-    pass 
-
-
-def vels(speed,turn):
-	return "currently:\tspeed %s\tturn %s " % (speed,turn)
-
-def callback(data):
-	rospy.loginfo(rospy.get_caller_id() + "I heard %c", data.data)
-	pub_to_car(data.data)
-
 def pub_to_car(data):
 	pub = rospy.Publisher('cmd_vel', Twist,queue_size=1)
-	key = chr(data)
+	#key = chr(data)
+	key = data
 	print('key')
-	print(key)
-	f.write(key)
 	global speed, turn
 	if key in moveBindings.keys():
 		x = moveBindings[key][0]
 		y = moveBindings[key][1]
 		th = moveBindings[key][2]
+		print(key)
 	elif key in speedBindings.keys():
 		speed = speed * speedBindings[key][0]
 		turn = turn * speedBindings[key][1]
@@ -101,13 +63,13 @@ def pub_to_car(data):
 			#break
 
 	twist = Twist()
-	twist.linear.x = x*speed 
-	twist.linear.y = y*speed 
+	twist.linear.x = x*speed*(-1) 
+	twist.linear.y = y*speed*(-1) 
 	twist.linear.z = 0
 
 	twist.angular.x = 0 
 	twist.angular.y = 0
-	twist.angular.z = th*turn
+	twist.angular.z = th*turn*(-1)
 	start = time.time()
 	end = start
 	if key == 'k':	 #stop
@@ -124,25 +86,20 @@ def pub_to_car(data):
 		twist.linear.x = 0; twist.linear.y = 0; twist.linear.z = 0
 		twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
 		pub.publish(twist)
-		
-	
-
-def listener():
-	#pub = rospy.Publisher('cmd_vel', Twist)
-	print('listener')
-	rospy.init_node('teleop_twist_keyboard')
-	rospy.Subscriber("chatter", Char, callback)
-	print vels(speed,turn)
-	x = 0
-	y = 0
-	th = 0
-	status = 0
-	rospy.spin()
 
 if __name__=="__main__":
-    	settings = termios.tcgetattr(sys.stdin)
-	print msg
-	listener()
+	rospy.init_node('teleop_twist_keyboard')
+	f = open("/home/huang/data2.txt","r")
+	pub_time  = float(f.readline())
+	print(pub_time)
+	speed = float(f.readline())
+	print(speed)
+	turn = float(f.readline())
+	print(turn)
+	data = f.readline()
+	for i in reversed(data):
+		pub_to_car(i)
+		#print(i)
+	print(len(data))
 	f.close()
-
 

@@ -9,8 +9,9 @@
 #include<queue>
 #include<stdio.h>
 #include<iostream>
-#define get_data_rate 15 //5
-#define pub_data_rate 3 //1
+
+#define get_data_rate 50 //5
+#define pub_data_rate 10 //1
 //#define CalSlopeAndPixelOnly
 #define theshold 1000 //the theshold of the camera pixel
 using namespace cv;
@@ -32,8 +33,9 @@ class FindLine_V
 		
 		FILE *fout;
 		fout = fopen("/home/huang/slope.txt","a");
-		fprintf(fout,"%s","----------------");		
-		image_sub_ = it_.subscribe("/camera/image_raw", 1, &FindLine_V::FindLineCB, this);
+		fprintf(fout,"%s","----------------");	
+		fclose(fout);	
+		image_sub_ = it_.subscribe("/camera/image_rect_color", 1, &FindLine_V::FindLineCB, this);
 		chatter_pub = nh_.advertise<std_msgs::Char>("chatter",10);//
 		namedWindow("Find line");
 		dilate_ = getStructuringElement(MORPH_RECT, Size(9, 9), Point(4, 4));
@@ -77,6 +79,7 @@ class FindLine_V
 				msg_to_car.data = 'k';
 				ROS_INFO("%c", msg_to_car.data);
 				chatter_pub.publish(msg_to_car);
+				pub_data = msg_to_car.data;
 				break;
 			}
 			else
@@ -109,13 +112,23 @@ class FindLine_V
 		static int image_index = 0;
 		char str[2]={'f','i'};
 		image_index++;
-		sprintf(str,"%d.jpg",image_index);		
+		sprintf(str,"%d.jpg",image_index);
+		FILE *fout2;
+		fout2 = fopen("/home/huang/data.txt","a");
+		if(fout2==NULL) 
+		{
+   			printf("Fail To Open File data.txt!!");
+   			fclose(fout2);
+   			return;
+ 		}
 		if(now==1)
 		{
 			
 			msg_to_car.data = pub_que.back();
 			ROS_INFO("%c", msg_to_car.data);
 			chatter_pub.publish(msg_to_car);
+			pub_data = msg_to_car.data;
+			fprintf(fout2,"%c",pub_data);
 			imwrite(str,drawing);
 			while (!pub_que.empty()) //clear the queue 
 			{
@@ -127,6 +140,8 @@ class FindLine_V
 			msg_to_car.data = pub_que.front();
 			ROS_INFO("%c", msg_to_car.data);
 			chatter_pub.publish(msg_to_car);
+			pub_data = msg_to_car.data;
+			fprintf(fout2,"%c",pub_data);
 			imwrite(str,drawing);
 		}	
 		else
@@ -136,10 +151,13 @@ class FindLine_V
 			{
         			pub_que.pop();
     			}
-			chatter_pub.publish(msg_to_car);		
+			chatter_pub.publish(msg_to_car);
+			pub_data = msg_to_car.data;	
+			fprintf(fout2,"%c",pub_data);	
 			ROS_INFO("%c", msg_to_car.data);
 			imwrite(str,drawing);
-		}	
+		}
+		fclose(fout2);	
 	}
 	bool PublishEqualChar()
 	{
@@ -175,17 +193,29 @@ class FindLine_V
 		roi_Rect[1] = Rect(0, pt2_st, roi.cols, sec_y);
 		check_up = roi(roi_Rect[0]);
 		//check_up = image(Rect(0, image.rows/2, image.cols, image.rows/8));//roi up
+		
+		/* black line
 		cvtColor(check_up, check_up, COLOR_BGR2GRAY);
 		GaussianBlur(check_up, check_up, Size(19, 19), 0);
-		threshold(check_up, check_up, 15, 255, THRESH_BINARY_INV);
-		
+		threshold(check_up, check_up, 15, 255, THRESH_BINARY_INV);*/
+		Mat hsv_up;  cvtColor(check_up, hsv_up, COLOR_BGR2HSV);
+		Mat mask_up, r1_up, r2_up;
+		inRange(hsv_up, Scalar(0, 20, 30), Scalar(10, 255, 255), r1_up);
+		inRange(hsv_up, Scalar(170, 20, 30), Scalar(180,255, 255), r2_up);
+		mask_up = r1_up | r2_up;
 		check_down = roi(roi_Rect[1]);
-		//check_down = image(Rect(0, (image.rows)*(7.0/8.0), image.cols, image.rows/8));//roi down
+		/* black line method		
 		cvtColor(check_down, check_down, COLOR_BGR2GRAY);
 		GaussianBlur(check_down, check_down, Size(19, 19), 0);
-		threshold(check_down, check_down, 15, 255, THRESH_BINARY_INV);
-		count_W_up = countNonZero(check_up);
-		count_W_down = countNonZero(check_down);
+		threshold(check_down, check_down, 15, 255, THRESH_BINARY_INV);*/
+		Mat hsv_down;  cvtColor(check_down, hsv_down, COLOR_BGR2HSV);
+		Mat mask_down, r1_down, r2_down;
+		inRange(hsv_down, Scalar(0, 20, 30), Scalar(10, 255, 255), r1_down);
+		inRange(hsv_down, Scalar(170, 20, 30), Scalar(180,255, 255), r2_down);
+		mask_down = r1_down | r2_down;
+
+		count_W_up = countNonZero(mask_up);
+		count_W_down = countNonZero(mask_down);
 		//cout<<"count_W_up"<<count_W_up<<endl;
 		//cout<<"count_W_down"<<count_W_down<<endl;
 		if((count_W_up < theshold)||(count_W_down < theshold))
@@ -203,14 +233,18 @@ class FindLine_V
 			{
 				Mat src = roi(roi_Rect[r]);
 			
-				cvtColor(src, src, COLOR_BGR2GRAY);
+				/*cvtColor(src, src, COLOR_BGR2GRAY);
 				GaussianBlur(src, src, Size(19, 19), 0);
 				threshold(src, src, 15, 255, THRESH_BINARY_INV);
-				dilate(src, src, dilate_);
-				
+				dilate(src, src, dilate_);*/
+				Mat hsv;  cvtColor(src, hsv, COLOR_BGR2HSV);
+				Mat mask, r1, r2;
+				inRange(hsv, Scalar(0, 20, 30), Scalar(10, 255, 255), r1);
+				inRange(hsv, Scalar(170, 20, 30), Scalar(180,255, 255), r2);
+				mask = r1 | r2;
 				vector<vector<Point> > contours;
 				vector<Vec4i> hierarchy;
-				findContours(src, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
+				findContours(mask, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
 				
 				//cout<<contours.size()<<"  "<<contours[0].size()<<endl;
 				//cout<"FC"<<endl;
@@ -287,7 +321,7 @@ class FindLine_V
 			pub_que.push('t');
 		else if(1.1<=m_line&&m_line<5)//right front 60 degree
 			pub_que.push('y');
-		else if(-1.1<=m_line&&m_line<-0.3)//left front 30 degree
+		else if(-1.1<=m_line&&m_line<-0.1)//left front 30 degree
 			pub_que.push('r');
 		else if(-5<=m_line&&m_line<-1.1)//left front 60 degree
 			pub_que.push('e');
@@ -305,8 +339,9 @@ class FindLine_V
    			printf("Fail To Open File slope.txt!!");
    			fclose(fout);
    			return;
- 		}		
+ 		}
 		fprintf(fout,"%lf\n",m_line);
+		fclose(fout);
 	}
 	private:
 		Mat roi, check_up,check_down, dilate_, drawing,image;
@@ -314,13 +349,17 @@ class FindLine_V
 		vector<vector<Point> > cnt;
 		int pt2_st, sec_y; 
 		Point2i centers[2]; 
-		int count_W_up,count_W_down;double m_line;
+		int cnt_W_up,count_W_down,count_W_up;double m_line;
 		queue<char> pub_que;
+		char pub_data;
 		//FILE *fout;
 	
 };
 
 int main(int argc, char** argv){
+	FILE *fout2;
+	fout2 = fopen("/home/huang/data.txt","w");
+	fclose(fout2);
 	ros::init(argc, argv, "find_line");
 	FindLine_V fl;
 	

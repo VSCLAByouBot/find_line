@@ -9,7 +9,7 @@ import time
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Char
 import sys, select, termios, tty, signal
-pub_time = 0.13# publish how long time
+pub_time = 0.1# publish how long time
 speed = 0.2
 turn = 0.3
 f = open('/home/huang/data2.txt','w')

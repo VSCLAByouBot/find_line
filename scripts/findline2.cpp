@@ -84,8 +84,10 @@ class FindLine_V
 			}
 			else
 			{
-				rate.sleep();
-				static int index = 0;//to avoid to go to case3 right after finishing case2
+				rate.sleep();				
+				FindLine_V::CalSlopeAndPixel();
+				FindLine_V::pub_to_car(0);			
+				/*static int index = 0;//to avoid to go to case3 right after finishing case2
 				if(!pub_que.empty()&&!FindLine_V::PublishEqualChar())//publish immediately
 					{cout<<"case 1";FindLine_V::pub_to_car(1);}
 				else if(pub_que.size()>=(get_data_rate/pub_data_rate))//publish every fixed time
@@ -98,14 +100,14 @@ class FindLine_V
 							FindLine_V::pub_to_car(2);
 						}
 						index = 0;
-					}
+					}*/
 				
 				
 			}
 			#endif
 		}//end while
 	}
-	void pub_to_car(int now)///
+	void pub_to_car(int now)///now is useless now
 	{
 		
 		std_msgs::Char msg_to_car;
@@ -121,7 +123,7 @@ class FindLine_V
    			fclose(fout2);
    			return;
  		}
-		if(now==1)
+		/*if(now==1)
 		{
 			
 			msg_to_car.data = pub_que.back();
@@ -143,20 +145,20 @@ class FindLine_V
 			pub_data = msg_to_car.data;
 			fprintf(fout2,"%c",pub_data);
 			imwrite(str,drawing);
-		}	
-		else
-		{		
-			msg_to_car.data = pub_que.front();
-			while (!pub_que.empty()) //clear the queue 
-			{
-        			pub_que.pop();
-    			}
-			chatter_pub.publish(msg_to_car);
-			pub_data = msg_to_car.data;	
-			fprintf(fout2,"%c",pub_data);	
-			ROS_INFO("%c", msg_to_car.data);
-			imwrite(str,drawing);
+		}*/	
+		//else
+		//{		
+		msg_to_car.data = pub_que.front();
+		while (!pub_que.empty()) //clear the queue 
+		{
+			pub_que.pop();
 		}
+		chatter_pub.publish(msg_to_car);
+		pub_data = msg_to_car.data;	
+		fprintf(fout2,"%c",pub_data);	
+		ROS_INFO("%c", msg_to_car.data);
+		imwrite(str,drawing);
+		//}
 		fclose(fout2);	
 	}
 	bool PublishEqualChar()
@@ -314,7 +316,7 @@ class FindLine_V
 	}// end CalSlopeAndPixel
 	void TransSlopeToChar()
 	{
-		pub_que.push('i');
+		//pub_que.push('i');
 		if(-0.1<=m_line&&m_line<0.1)//forwards
 			pub_que.push('i');
 		else if(0.1<=m_line&&m_line<1.1)//right front 30 degree

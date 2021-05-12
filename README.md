@@ -5,7 +5,9 @@
 - [ROS Image Proc Package](http://wiki.ros.org/image_proc)
 - Camera:flea3 point grey camera 
 ## Background
-## the order of executing the code
+## How to compile the code
+- compile it with catkin_make
+## The order of executing the code
 1.launch the youbot and camera driver
 ```
 $ roslaunch youbot_driver_ros_interface youbot_driver.launch
@@ -20,6 +22,7 @@ Then you can see the picture by the instruction
 $ rosrun image_view image_view image:=my_camera/image_rect_color
 ```
 3. Open the node
+## File Description
 
 ## Method
 - Node架構圖

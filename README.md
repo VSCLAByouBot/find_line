@@ -22,4 +22,4 @@ $ rosrun image_view image_view image:=my_camera/image_rect_color
 3. Open the node
 
 ## Method
-- Node
+- Node架構圖

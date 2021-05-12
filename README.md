@@ -6,7 +6,7 @@
 - Camera:flea3 point grey camera 
 ## Background
 ## How to compile the code
-- compile it with catkin_make
+- compile it with ROS catkin_make
 ## The order of executing the code
 1.launch the youbot and camera driver
 ```
@@ -23,6 +23,11 @@ $ rosrun image_view image_view image:=my_camera/image_rect_color
 ```
 3. Open the node
 ## File Description
-
+- findline3.cpp
+  - It is an unfinished code, we want to modify the window of findline2.cpp which was finding the redline, to turn the window moveable.
+- findline2.cpp
+- arm_init.cpp
+- go_back.py
+- 
 ## Method
 - Node架構圖

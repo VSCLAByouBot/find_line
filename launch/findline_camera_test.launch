@@ -1,0 +1,37 @@
+<launch>
+
+<include file="$(find pointgrey_camera_driver)/launch/camera.launch"/>
+
+<!-- For find_red_line -->
+<param name="/image_pub" type="bool" value="False" />
+<param name="/image_save" type="bool" value="False" />
+<param name="/print_red_info" type="bool" value="False" />
+
+<!-- For follow_line -->
+<param name="/using_action" type="bool" value="True" />
+<param name="/record_path" type="bool" value="True" />
+
+<!-- For debugging by task -->
+<param name="/do_arm_ini" type="bool" value="True" />
+<param name="/do_follow_line" type="bool" value="False" />
+<param name="/do_back_line" type="bool" value="False" />
+<param name="/do_arm_home" type="bool" value="True" />
+
+<node name="image_proc" pkg="image_proc" type="image_proc" ns="camera"/>
+
+<node name="youbot_arm_fix_pos" pkg="find_line" respawn="true" type="youbot_arm_fix_pos"/>
+<node name="find_red_line" pkg="find_line" type="camera_red_line" output="screen">
+    <remap from="camera/image_raw" to="camera/image_rect_color" />
+</node>
+<node name="follow_line" pkg="find_line" type="follow_line_test.py" output="screen"/>
+<node name="follow_record" pkg="find_line" type="follow_record.py" output="screen"/>
+<node name="youbot_find_line" pkg="find_line" type="youbot_find_line" required="true" output="screen"/>
+
+<!-- Only needed if /image_pub is true-->
+<!--
+<node name="image_view" pkg="image_view" type="image_view" respawn="true" output="screen">
+    <remap from="image" to="/camera/find_red_line" />
+</node>
+-->
+
+</launch>

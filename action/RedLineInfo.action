@@ -1,0 +1,11 @@
+# goal
+bool ready
+---
+# result
+bool status
+---
+# feedback
+int64 up_px
+int64 dn_px
+float32 slope
+string pace

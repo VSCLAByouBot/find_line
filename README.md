@@ -5,6 +5,11 @@
 - Platform: KUKA youBot
 - Visual Device: Pointgrey Flea3 camera 
 
+## Using Sources
+- [pointgrey_camera_driver](http://wiki.ros.org/pointgrey_camera_driver)
+- [camera_calibration](http://wiki.ros.org/camera_calibration)
+- [image_proc](http://wiki.ros.org/image_proc)
+
 ## Different Features
 - Addition of the launch file, which allows to open all the nodes at one time, and has no need to launch camera driver first
 - Adjust the Architecture of nodes/ tasks, increase the ability of reuse of each nodes

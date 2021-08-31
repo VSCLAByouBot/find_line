@@ -25,7 +25,6 @@
 
 4. Wait for the "Find Line" window pop out and continue to follow the hints on the screen.
 
-## Hints
 ### Parameters of launch file
 
 For node <find_red_line>

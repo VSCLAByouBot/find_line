@@ -48,6 +48,37 @@ For node <youbot_find_line>
    
 ## Architecture of the Nodes
 
+```
+main.cpp <youbot_follow_redline>
+ │  
+ ├ ServiceClient "arm_fix_position_srv" pos:=follow_line
+ │    │
+ │    └ arm_fix_server.cpp <youbot_arm_fix_pos>
+ │         ├ ServiceServer "arm_fix_position_srv"                 
+ │         └ Publisher "arm_1/arm_controller/position_command"    → youBot arm
+ │
+ ├ SimpleActionClient "ac_follow_line" ready:=True
+ │    │
+ │    └ follow_line.py <follow_line>
+ │         ├ SimpleActionServer "ac_follow_line"
+ │         └ Subscriber "line_slope_and_px"
+ │         └ Publisher "cmd_vel"                                  → youBot base
+ │              │
+ │              └ find_red_line.cpp <find_red_line>
+ │                   └ Subscriber "camera/image_rect_color"       ← camera (after calibration)
+ │                   └ Publisher  "line_slope_and_px"             → <follow_line>
+ │                   └ Publisher  "camera/find_red_line"          → <image_view>
+ │
+ ├ ServiceClient <follow_record_srv> directory:="back"
+ │    │
+ │    └ follow_record.py <follow_record>
+ │         ├ ServiceServer "follow_record_srv"
+ │         ├ ( read from ".../find_line/record/pace.txt")
+ │         └ Publisher "cmd_vel"                                  → youBot base
+ │
+ └ ServiceClient "arm_fix_position_srv" pos:=home
+``` 
+
 ## Futurework
 
 + Add a argument or parameter in the launch file which allows it to find the right filepath in current environment in auto.

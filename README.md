@@ -15,12 +15,12 @@
 
 2. Launch the youbot camera driver
     ```
-    $ roslaunch youbot_driver_ros_interface youbot_driver.launch
+    roslaunch youbot_driver_ros_interface youbot_driver.launch
     ```
 
 3. Launch youbot_findline.launch
     ```
-    $ roslaunch find_line youbot_findline.launch
+    roslaunch find_line youbot_findline.launch
     ```
 
 4. Wait for the "Find Line" window pop out and continue to follow the hints on the screen.

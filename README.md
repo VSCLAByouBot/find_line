@@ -13,6 +13,8 @@
 
 1. First, clone the whole repository to your workspace and compile by catkin.
 
+2. Adjust the filepathes in .../script/follow_line.py and .../script/follow_record.py
+
 2. Launch the youbot camera driver
     ```
     roslaunch youbot_driver_ros_interface youbot_driver.launch
@@ -46,3 +48,7 @@ For node <youbot_find_line>
    
 ## Architecture of the Nodes
 
+## Futurework
+
++ Add a argument or parameter in the launch file which allows it to find the right filepath in current environment in auto.
++ Change the feedback of the actionlib to a sequence of paces, and pass to node <follow_record> as the request.   

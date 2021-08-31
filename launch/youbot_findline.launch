@@ -13,8 +13,8 @@
 
 <!-- For debugging by task -->
 <param name="/do_arm_ini" type="bool" value="True" />
-<param name="/do_follow_line" type="bool" value="False" />
-<param name="/do_back_line" type="bool" value="False" />
+<param name="/do_follow_line" type="bool" value="True" />
+<param name="/do_back_line" type="bool" value="True" />
 <param name="/do_arm_home" type="bool" value="True" />
 
 <node name="image_proc" pkg="image_proc" type="image_proc" ns="camera"/>

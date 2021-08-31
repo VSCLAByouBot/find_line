@@ -7,10 +7,6 @@
 <param name="/image_save" type="bool" value="False" />
 <param name="/print_red_info" type="bool" value="False" />
 
-<!-- For follow_line -->
-<param name="/using_action" type="bool" value="True" />
-<param name="/record_path" type="bool" value="True" />
-
 <!-- For debugging by task -->
 <param name="/do_arm_ini" type="bool" value="True" />
 <param name="/do_follow_line" type="bool" value="True" />

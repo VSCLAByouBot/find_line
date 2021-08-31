@@ -5,9 +5,6 @@ import find_line.msg
 from geometry_msgs.msg import Twist
 import time
 
-ac_start = rospy.get_param('/using_action', True)
-rec = rospy.get_param('/record_path', True)
-
 moveBindings = {
 	# x,y,tetha ratio
 	'i':(0.6, 0, 0), 		# forwards
@@ -49,24 +46,7 @@ class FollowLine():
 
         rospy.Subscriber("line_slope_and_px", find_line.msg.SlopeAndPixel, self.slope_and_px_cb)
         self.ac_server = actionlib.SimpleActionServer('follow_line_as', find_line.msg.RedLineInfoAction, execute_cb=self.exe_cb, auto_start=False)
-        
-        if ac_start:
-            self.ac_server.start()
-        else:
-            rospy.sleep(1)  # delay one sec
-
-            loop_rate = rospy.Rate(1)
-            while not rospy.is_shutdown():
-                if self.cal_white_px(self.up_px, self.dn_px):
-                    pace = self.go_by_slope(self.slope)
-                    print("Slope: %3f => pace : %c ; %s" % (self.slope, pace, moveMeaning[pace]))  
-                    self.pub_to_car(pace)
-                else:
-                    self.pub_to_car('k')
-                    break
-
-                loop_rate.sleep()
-        #rospy.spin()
+        self.ac_server.start()
 
     def slope_and_px_cb(self, data):
         
@@ -155,9 +135,7 @@ class FollowLine():
         
     def pub_to_car(self, pace):
         pub = rospy.Publisher('cmd_vel', Twist, queue_size=1)        
-
-        if rec:
-            self.record_pace(pace)
+        self.record_pace(pace)
 
         if pace in moveBindings.keys():
             x  = moveBindings[pace][0]

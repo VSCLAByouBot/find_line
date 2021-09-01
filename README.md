@@ -82,7 +82,12 @@ main.cpp <youbot_follow_redline>
  └ ServiceClient "arm_fix_position_srv" pos:=home
 ``` 
 
-## Futurework
+## Future work
+
+<find_line_test.py> 和 <follow_record.py> 中讀取 txt 的方式是直接給予位址 string，由於針對不同電腦 home 資料夾的位置都不同，因此改起來會很麻煩
+
++ 方法一：在 launch 檔中增加 arg 或 param
++ 方法二：把 find_line 的 action feedback 改成 pace 的 char sequence，
 
 + Add a argument or parameter in the launch file which allows it to find the right filepath in current environment in auto.
 + Change the feedback of the actionlib to a sequence of paces, and pass to node <follow_record> as the request.   

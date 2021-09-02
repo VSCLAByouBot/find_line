@@ -84,9 +84,11 @@ main.cpp <youbot_follow_redline>
 
 ## Future work
 
-<find_line_test.py> 和 <follow_record.py> 中讀取 txt 的方式是直接給予位址 string，由於針對不同電腦 home 資料夾的位置都不同，因此改起來會很麻煩。
+1. <find_line_test.py> 和 <follow_record.py> 中讀取 txt 的方式是直接給予位址 string，由於針對不同電腦 home 資料夾的位置都不同，因此改起來會很麻煩。
 
-+ 方法一：在 launch 檔中增加 arg 或 param
-+ 方法二：把 find_line 的 action feedback 改成 pace 的 char sequence，再當作 follow_record 的 request 送出
+    + 方法一：在 launch 檔中增加 arg 或 param
+    + 方法二：把 find_line 的 action feedback 改成 pace 的 char sequence，再當作 follow_record 的 request 送出
 
-兩種方法應該都很好實踐，但是我很懶，就先不休了。
+    兩種方法應該都很好實踐<s>，但是我很懶，就先不修了</s>。
+
+2. 循跡前進部分的程式目前只求能夠追蹤，之後可以再細修判斷部分的程式，以求保持紅線於畫面中央

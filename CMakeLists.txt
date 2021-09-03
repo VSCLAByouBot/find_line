@@ -69,12 +69,6 @@ target_link_libraries(youbot_arm_fix_pos
   ${catkin_LIBRARIES}
 )
 
-add_executable(find_red_line src/find_red_line.cpp)
-target_link_libraries(find_red_line
-  ${catkin_LIBRARIES}
-  ${OpenCV_INCLUDE_DIRS}
-)
-
 add_executable(camera_red_line src/find_red_line_camera.cpp)
 target_link_libraries(
   camera_red_line
@@ -85,10 +79,7 @@ target_link_libraries(
 
 ## python files
 catkin_install_python(PROGRAMS
-  #script/follow_record.py
-  #script/follow_line.py
-# script/cam_sim_talker.py
+  script/follow_record.py
   script/follow_line_test.py
-# script/base_listener.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
